@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/nowplaying_btn"
+        android:title="Now Playing"
+        android:icon="@drawable/baseline_movie_24"/>
+
+    <item
+        android:id="@+id/upcoming_btn"
+        android:title="Upcoming"
+        android:icon="@drawable/baseline_tv_24"/>
+
+    <item
+        android:id="@+id/favorite_btn"
+        android:title="Favorites"
+        android:icon="@drawable/baseline_favorite_24"
+        android:iconTint="@color/black"/>
+
+    <item
+        android:id="@+id/search_btn"
+        android:title="Search"
+        android:icon="@drawable/baseline_search_24"
+        android:iconTint="@color/black"/>
+
+
+
+
+
+</menu>
