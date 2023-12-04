@@ -20,9 +20,11 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
 import com.example.appmovie.R;
-import com.example.appmovie.adapter.TvShowAdapter;
-import com.example.appmovie.dataresponse.TvShowDataResponse;
-import com.example.appmovie.model.Tvshow;
+import com.example.appmovie.adapter.MovieAdapter;
+import com.example.appmovie.dataresponse.MovieDataResponse;
+import com.example.appmovie.dataresponse.MovieDetailDataResponse;
+import com.example.appmovie.dataresponse.UpcomingMovieDataResponse;
+import com.example.appmovie.model.MovieModel;
 import com.example.appmovie.api.ApiConfig;
 
 import java.util.ArrayList;
@@ -34,7 +36,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class UpComingFragment extends Fragment {
+public class UpcomingFragment extends Fragment {
 
     private RecyclerView recyclerView;
     private LinearLayout retryicon;
@@ -42,17 +44,16 @@ public class UpComingFragment extends Fragment {
     private Handler handler;
     private ImageView Retryy;
 
-    public static ArrayList<Tvshow> dataPerson = new ArrayList<>();
     public static final String API_KEY = "35254a98cc59f9518caf1bacbf0f5792";
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_tv_show, container, false);
+        View view = inflater.inflate(R.layout.fragment_movie, container, false);
 
         retryicon = view.findViewById(R.id.retryicon);
-        recyclerView = view.findViewById(R.id.recyclerView2);
+        recyclerView = view.findViewById(R.id.recyclerView);
         progressBar = view.findViewById(R.id.pb1);
         Retryy = view.findViewById(R.id.retry);
         GridLayoutManager layoutManager = new GridLayoutManager(getContext(), 2);
@@ -72,26 +73,27 @@ public class UpComingFragment extends Fragment {
             recyclerView.setVisibility(View.VISIBLE);
 
             //call -> untuk mengambil data di reqres.in disini dia mengambil data perpage
-            Call<TvShowDataResponse> call = ApiConfig.getApiService().getPopularTVShows(API_KEY);
-            call.enqueue(new Callback<TvShowDataResponse>() {
+            Call<UpcomingMovieDataResponse> call = ApiConfig.getApiService().getUpcomingMovies(API_KEY);
+            call.enqueue(new Callback<UpcomingMovieDataResponse>() {
                 @Override
-                public void onResponse(Call<TvShowDataResponse> call, Response<TvShowDataResponse> response) {
+                public void onResponse(Call<UpcomingMovieDataResponse> call, Response<UpcomingMovieDataResponse> response) {
                     if (response.isSuccessful()) {
                         if (response.body() != null) {
-                            List<Tvshow> userResponse = response.body().getData3(); // Assuming movie list is stored in the "data" field
-                            TvShowAdapter adapter = new TvShowAdapter(getContext(), userResponse);
+                            List<MovieModel> userResponse = response.body().getData(); // Assuming movie
+                            // list is stored in the "data" field
+                            MovieAdapter adapter = new MovieAdapter(getContext(), userResponse);
                             recyclerView.setAdapter(adapter);
                         } else {
                             if (response.errorBody() != null) {
-                                Log.d("UpComingFragment", "Unable to fetch data!");
+                                Log.d("UpcomingFragment", "Unable to fetch data!");
                             }
                         }
                     }
                 }
 
                 @Override
-                public void onFailure(Call<TvShowDataResponse> call, Throwable t) {
-                    Log.d("UpComingFragment", "Unable to fetch data!");
+                public void onFailure(Call<UpcomingMovieDataResponse> call, Throwable t) {
+                    Log.d("UpcomingFragment", "Unable to fetch data!");
                 }
             });
         } else {

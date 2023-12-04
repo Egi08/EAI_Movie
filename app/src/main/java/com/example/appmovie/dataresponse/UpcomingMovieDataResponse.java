@@ -1,16 +1,16 @@
 package com.example.appmovie.dataresponse;
 
-import com.example.appmovie.model.Tvshow;
+import com.example.appmovie.model.MovieModel;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-public class TvShowDataResponse {
+public class UpcomingMovieDataResponse {
     @SerializedName("results")
 
-    private List<Tvshow> results;
+    private List<MovieModel> results;
 
-    public List<Tvshow> getData3() {
+    public List<MovieModel> getData() {
         return results;
     }
 }

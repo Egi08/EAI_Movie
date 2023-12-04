@@ -25,7 +25,6 @@ import com.example.appmovie.model.MovieModel;
 import com.example.appmovie.R;
 import com.example.appmovie.api.ApiConfig;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -46,7 +45,6 @@ public class NowPlayingFragment extends Fragment {
 
     private ImageView Retryy;
 
-    public static ArrayList<MovieModel> dataPerson = new ArrayList<>();
     public static final String API_KEY = "35254a98cc59f9518caf1bacbf0f5792";
 
     @Override
@@ -77,14 +75,16 @@ public class NowPlayingFragment extends Fragment {
             recyclerView.setVisibility(View.VISIBLE);
 
             //call -> untuk mengambil data di reqres.in disini dia mengambil data perpage
-            Call<MovieDataResponse> call = ApiConfig.getApiService().getPopularMovies(API_KEY);
+            Call<MovieDataResponse> call = ApiConfig.getApiService().getNowPlayingMovies(API_KEY);
+            // log call
+            Log.d("NowPlayingFragment", "URL Called" + call.request().url());
             call.enqueue(new Callback<MovieDataResponse>() {
                 @Override
                 public void onResponse(Call<MovieDataResponse> call, Response<MovieDataResponse> response) {
                     if (response.isSuccessful()) {
                         if (response.body() != null) {
-                            List<MovieModel> userResponse = response.body().getData(); // Assuming movie list is stored in the "data" field
-                            MovieAdapter adapter = new MovieAdapter(getContext(), userResponse);
+                            List<MovieModel> movieResponse = response.body().getData(); // Assuming movie list is stored in the "data" field
+                            MovieAdapter adapter = new MovieAdapter(getContext(), movieResponse);
                             recyclerView.setAdapter(adapter);
                         } else {
                             if (response.errorBody() != null) {

@@ -11,7 +11,7 @@ import com.example.appmovie.R;
 import com.example.appmovie.fragment.FavoriteFragment;
 import com.example.appmovie.fragment.NowPlayingFragment;
 import com.example.appmovie.fragment.SearchFragment;
-import com.example.appmovie.fragment.UpComingFragment;
+import com.example.appmovie.fragment.UpcomingFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
                 replaceFragment(new NowPlayingFragment());
                 barTitle.setText("Now Playing");
             } else if (id == R.id.upcoming_btn) {
-                replaceFragment(new UpComingFragment());
+                replaceFragment(new UpcomingFragment());
                 barTitle.setText("Upcoming");
             } else if (id == R.id.favorite_btn) {
                 replaceFragment(new FavoriteFragment());
