@@ -28,6 +28,8 @@ import java.util.Locale;
 public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ViewHolder> {
     private final String imgBaseUrl = "https://image.tmdb.org/t/p/w500";
     private ArrayList<FavoriteModel> favoriteModels;
+
+
     private ActivityResultLauncher<Intent> resultLauncher;
 
     public FavoriteAdapter(ArrayList<FavoriteModel> favoriteModels, ActivityResultLauncher<Intent> resultLauncher) {
@@ -35,13 +37,18 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ViewHo
         this.resultLauncher = resultLauncher;
     }
 
+
+
     @NonNull
     @Override
     public FavoriteAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
         View view = layoutInflater.inflate(R.layout.favorite_item, parent, false);
         return new ViewHolder(view);
+
+
     }
+
 
     @Override
     public void onBindViewHolder(@NonNull FavoriteAdapter.ViewHolder holder, int position) {
@@ -49,6 +56,14 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ViewHo
         FavoriteModel favoriteModel = favoriteModels.get(position);
         holder.setDataMovie(favoriteModel, context);
     }
+
+//    public FavoriteAdapter(ArrayList<FavoriteModel> favoriteModels) {
+//        this.favoriteModels = favoriteModels;
+//    }
+//
+//    public void setResultLauncher(ActivityResultLauncher<Intent> resultLauncher) {
+//        this.resultLauncher = resultLauncher;
+//    }
 
     @Override
     public int getItemCount() {
