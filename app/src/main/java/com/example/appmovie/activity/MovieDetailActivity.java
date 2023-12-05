@@ -14,10 +14,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.example.appmovie.model.FavoriteModel;
 import com.example.appmovie.model.MovieModel;
 import com.example.appmovie.R;
 import com.example.appmovie.api.ApiConfig;
 import com.example.appmovie.dataresponse.MovieDetailDataResponse;
+import com.example.appmovie.sqllite.FavoriteHelper;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -35,6 +37,10 @@ public class MovieDetailActivity extends AppCompatActivity {
     private TextView tv4, tv5, tv6, date;
     boolean isFavorite = false;
     public static final int TYPE = 1;
+
+    FavoriteModel favoriteModel = new FavoriteModel();
+
+    FavoriteHelper favoriteHelper = FavoriteHelper.getInstance(this);
 
 
     @Override
@@ -63,9 +69,11 @@ public class MovieDetailActivity extends AppCompatActivity {
         love.setOnClickListener(view -> {
             if (!isFavorite) {
                 love.setImageResource(R.drawable.red_favorite);
+                favoriteHelper.insert Favorite(favoriteModel);
                 isFavorite = true;
             } else {
                 love.setImageResource(R.drawable.baseline_favorite_border_24);
+                favoriteHelper.deleteFavorite(favoriteModel.getId());
                 isFavorite = false;
             }
         });
@@ -84,7 +92,6 @@ public class MovieDetailActivity extends AppCompatActivity {
                     if (response.isSuccessful()) {
                         Toast.makeText(MovieDetailActivity.this, "test", Toast.LENGTH_SHORT).show();
                         if (response.body() != null) {
-                            MovieModel movieModel = response.body().getData2();
 
                             String judul = getIntent().getStringExtra("judul");
                             String rating = getIntent().getStringExtra("rating");

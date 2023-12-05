@@ -3,17 +3,18 @@ package com.example.appmovie.sqllite;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.example.appmovie.model.FavoriteModel;
+
 public class FavoriteHelper {
     private static final String TABLE_NAME = DatabaseContract.TABLE_NAME;
-    private final DatabaseHelper databaseHelper;
+    private static DatabaseHelper databaseHelper;
     private static SQLiteDatabase database;
-    private static volatile FavoriteHelper INSTANCE;
+    private static FavoriteHelper INSTANCE;
 
-    public FavoriteHelper(Context context) {
+    private FavoriteHelper(Context context) {
         databaseHelper = new DatabaseHelper(context);
     }
 
@@ -28,18 +29,34 @@ public class FavoriteHelper {
         return INSTANCE;
     }
 
-    public void open() throws SQLException {
+    public void open() {
         database = databaseHelper.getWritableDatabase();
     }
 
     public void close() {
-        database.close();
-        if (database.isOpen()) {
+        databaseHelper.close();
+
+        if (database.isOpen())
             database.close();
-        }
     }
 
-    public Cursor queryShowAll() {
+    public long insertFavorite(FavoriteModel favoriteModel) {
+        ContentValues args = new ContentValues();
+        args.put(DatabaseContract.ItemColumns.TITLE, favoriteModel.getTitle());
+        args.put(DatabaseContract.ItemColumns.DATE, favoriteModel.getDate());
+        args.put(DatabaseContract.ItemColumns.OVERVIEW, favoriteModel.getOverview());
+        args.put(DatabaseContract.ItemColumns.POSTER_PATH, favoriteModel.getPoster_path());
+        args.put(DatabaseContract.ItemColumns.BACKDROP_PATH, favoriteModel.getBackdrop_path());
+        args.put(DatabaseContract.ItemColumns.VOTE_AVERAGE, favoriteModel.getVote_average());
+        args.put(DatabaseContract.ItemColumns.TYPE, favoriteModel.getType());
+        return database.insert(DatabaseContract.TABLE_NAME, null, args);
+    }
+
+    public int deleteFavorite(int id) {
+        return database.delete(DatabaseContract.TABLE_NAME, DatabaseContract.ItemColumns._ID + " = ?", new String[]{String.valueOf(id)});
+    }
+
+    public Cursor queryAll() {
         return database.query(
                 DatabaseContract.TABLE_NAME,
                 null,
@@ -47,23 +64,6 @@ public class FavoriteHelper {
                 null,
                 null,
                 null,
-                DatabaseContract.ItemColumns._ID + " ASC"
-        );
-    }
-
-    public int getFavouriteStatus(String id) {
-        return database.rawQuery("SELECT * FROM " + TABLE_NAME + " WHERE " + DatabaseContract.ItemColumns._ID + " = " + id, null).getCount();
-    }
-
-    public long insertData(ContentValues contentValues) {
-        return database.insert(TABLE_NAME, null, contentValues);
-    }
-
-    public int updateData(String id, ContentValues contentValues) {
-        return database.update(TABLE_NAME, contentValues, DatabaseContract.ItemColumns._ID + " = ?", new String[]{id});
-    }
-
-    public int deleteData(String id) {
-        return database.delete(TABLE_NAME, DatabaseContract.ItemColumns._ID + " = " + id, null);
+                DatabaseContract.ItemColumns._ID + " ASC");
     }
 }

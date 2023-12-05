@@ -3,28 +3,53 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#F1FAEE"
     tools:context=".fragment.FavoriteFragment">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/favouriteList_rv"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:listitem="@layout/favorite_item"/>
+        android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/error_message_tv"
-        android:layout_width="wrap_content"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            tools:listitem="@layout/movie_item" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/retryicon"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:textStyle="bold"
-        android:visibility="gone"
-        android:textAlignment="center"
-        android:text="There's something trouble \n try to reload your page"/>
+        android:orientation="vertical"
+        android:layout_centerInParent="true">
+
+        <ImageView
+            android:id="@+id/retry"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:src="@drawable/baseline_refresh_24"
+            android:onClick="retry" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Please check your internet connection" />
+
+
+    </LinearLayout>
 
     <ProgressBar
-        android:id="@+id/fav_progressbar"
+        android:id="@+id/pb1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="20dp"
+        android:layout_gravity="center"
         android:layout_centerInParent="true"/>
 
 </RelativeLayout>

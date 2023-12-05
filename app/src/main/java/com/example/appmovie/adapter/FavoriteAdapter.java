@@ -1,14 +1,12 @@
 package com.example.appmovie.adapter;
 
 import android.content.Context;
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
@@ -29,15 +27,9 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ViewHo
     private final String imgBaseUrl = "https://image.tmdb.org/t/p/w500";
     private ArrayList<FavoriteModel> favoriteModels;
 
-
-    private ActivityResultLauncher<Intent> resultLauncher;
-
-    public FavoriteAdapter(ArrayList<FavoriteModel> favoriteModels, ActivityResultLauncher<Intent> resultLauncher) {
+    public FavoriteAdapter(Context context, ArrayList<FavoriteModel> favoriteModels) {
         this.favoriteModels = favoriteModels;
-        this.resultLauncher = resultLauncher;
     }
-
-
 
     @NonNull
     @Override
@@ -45,10 +37,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ViewHo
         LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
         View view = layoutInflater.inflate(R.layout.favorite_item, parent, false);
         return new ViewHolder(view);
-
-
     }
-
 
     @Override
     public void onBindViewHolder(@NonNull FavoriteAdapter.ViewHolder holder, int position) {
@@ -57,23 +46,16 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ViewHo
         holder.setDataMovie(favoriteModel, context);
     }
 
-//    public FavoriteAdapter(ArrayList<FavoriteModel> favoriteModels) {
-//        this.favoriteModels = favoriteModels;
-//    }
-//
-//    public void setResultLauncher(ActivityResultLauncher<Intent> resultLauncher) {
-//        this.resultLauncher = resultLauncher;
-//    }
-
     @Override
     public int getItemCount() {
-        return 0;
+        return favoriteModels != null ? favoriteModels.size() : 0;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         ImageView imageView, icon;
         TextView title, releaseDate;
         CardView itemCard;
+
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             imageView = itemView.findViewById(R.id.imageView);
@@ -97,11 +79,6 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ViewHo
             } else {
                 icon.setImageResource(R.drawable.baseline_tv_24);
             }
-
-            itemCard.setOnClickListener(view -> {
-                Intent intent = new Intent(itemView.getContext(), MovieDetailActivity.class);
-                intent.putExtra("title", favoriteModel.getTitle());
-            });
         }
     }
 
