@@ -3,11 +3,11 @@ plugins {
 }
 
 android {
-    namespace 'com.example.appmovie'
+    namespace 'com.eai.appmovie'
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.example.appmovie"
+        applicationId "com.eai.appmovie"
         minSdk 27
         targetSdk 33
         versionCode 1
