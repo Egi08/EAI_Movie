@@ -14,19 +14,28 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.eai.appmovie.activity.MovieDetailActivity;
+import com.eai.appmovie.model.FavoriteModel;
 import com.eai.appmovie.model.MovieModel;
 import com.eai.appmovie.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> {
 
     Context context;
-    private List<MovieModel> dataPerson;
+    private List<MovieModel> movieModel;
 
-    public MovieAdapter(Context context, List<MovieModel> dataPerson) {
+    private ArrayList<FavoriteModel> favoriteModels;
+
+    public MovieAdapter(Context context, List<MovieModel> movieModel) {
         this.context = context;
-        this.dataPerson = dataPerson;
+        this.movieModel = movieModel;
+    }
+
+    public MovieAdapter(Context context, ArrayList<FavoriteModel> favoriteModels) {
+        this.context = context;
+        this.favoriteModels = favoriteModels;
     }
 
     @NonNull
@@ -40,35 +49,35 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull MovieAdapter.ViewHolder holder, int position) {
         Context context = holder.itemView.getContext();
-        MovieModel movieModelResponse = dataPerson.get(position);
+        MovieModel movieModelResponse = movieModel.get(position);
         holder.setData(movieModelResponse, context);
 
     }
 
     @Override
     public int getItemCount() {
-        return dataPerson.size();
+        return movieModel.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        TextView Name, date;
-        ImageView Profile;
+        TextView title, releaseDate;
+        ImageView imageView;
         CardView cardView;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            Name = itemView.findViewById(R.id.tv1);
-            date = itemView.findViewById(R.id.tv2);
-            Profile = itemView.findViewById(R.id.img1);
+            title = itemView.findViewById(R.id.tv1);
+            releaseDate = itemView.findViewById(R.id.tv2);
+            imageView = itemView.findViewById(R.id.img1);
             cardView = itemView.findViewById(R.id.cv1);
         }
 
         public void setData(MovieModel movieModel, Context context) {
-            Name.setText(movieModel.getTitle());
-            date.setText(movieModel.getReleaseDate().substring(0, 4));
+            title.setText(movieModel.getTitle());
+            releaseDate.setText(movieModel.getReleaseDate());
             Glide.with(itemView.getContext())
                     .load("https://image.tmdb.org/t/p/w500" + movieModel.getPosterPath())
-                    .into(Profile);
+                    .into(imageView);
 
             cardView.setOnClickListener(view -> {
                 Intent intent = new Intent(itemView.getContext(), MovieDetailActivity.class);

@@ -4,29 +4,30 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+// DatabaseHelper.java
 public class DatabaseHelper extends SQLiteOpenHelper {
 
-    public static final String DATABASE_NAME = "appmovie.db";
+    private static final String DATABASE_NAME = "eaimovie.db";
     private static final int DATABASE_VERSION = 1;
 
     private static final String SQL_CREATE_TABLE_FAVORITE = String.format("CREATE TABLE %s"
-                    + " (%s INTEGER PRIMARY KEY AUTOINCREMENT," +
-                    " %s TEXT NOT NULL," +
-                    " %s TEXT NOT NULL," +
-                    " %s TEXT NOT NULL," +
-                    " %s TEXT NOT NULL," +
-                    " %s TEXT NOT NULL," +
-                    " %s TEXT NOT NULL," +
-                    " %s TEXT NOT NULL)",
+                    + " (%s INTEGER PRIMARY KEY AUTOINCREMENT,"
+                    + " %s TEXT NOT NULL,"
+                    + " %s TEXT NOT NULL,"
+                    + " %s TEXT NOT NULL,"
+                    + " %s TEXT NOT NULL,"
+                    + " %s TEXT NOT NULL,"
+                    + " %s TEXT NOT NULL,"
+                    + " %s TEXT NOT NULL)",
             DatabaseContract.TABLE_NAME,
-            DatabaseContract.ItemColumns._ID,
-            DatabaseContract.ItemColumns.TITLE,
-            DatabaseContract.ItemColumns.DATE,
-            DatabaseContract.ItemColumns.OVERVIEW,
-            DatabaseContract.ItemColumns.POSTER_PATH,
-            DatabaseContract.ItemColumns.BACKDROP_PATH,
-            DatabaseContract.ItemColumns.VOTE_AVERAGE,
-            DatabaseContract.ItemColumns.TYPE
+            DatabaseContract.FavoriteColumns._ID,
+            DatabaseContract.FavoriteColumns.ID,
+            DatabaseContract.FavoriteColumns.TITLE,
+            DatabaseContract.FavoriteColumns.DATE,
+            DatabaseContract.FavoriteColumns.OVERVIEW,
+            DatabaseContract.FavoriteColumns.POSTER_PATH,
+            DatabaseContract.FavoriteColumns.BACKDROP_PATH,
+            DatabaseContract.FavoriteColumns.VOTE_AVERAGE
     );
 
     DatabaseHelper(Context context) {

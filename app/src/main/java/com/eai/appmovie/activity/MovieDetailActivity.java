@@ -8,18 +8,17 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.eai.appmovie.model.FavoriteModel;
-import com.eai.appmovie.model.MovieModel;
 import com.eai.appmovie.R;
 import com.eai.appmovie.api.ApiConfig;
 import com.eai.appmovie.dataresponse.MovieDetailDataResponse;
 import com.eai.appmovie.sqllite.FavoriteHelper;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -33,14 +32,16 @@ import retrofit2.Response;
 
 public class MovieDetailActivity extends AppCompatActivity {
 
-    private ImageView img2, img3, back, love;
-    private TextView tv4, tv5, tv6, date;
+    private ImageView imgFilmBanner, imgFilmCover, backBtn, favBtn;
+    private TextView tvFilmTitle, tvRating, tvFilmSynopsis, tvReleaseDate;
+
+    private FloatingActionButton fabShareBtn;
     boolean isFavorite = false;
-    public static final int TYPE = 1;
 
+    String movieId, judul, rating, synopsis, backdropPath, poster, dates;
+
+    FavoriteHelper favoriteHelper;
     FavoriteModel favoriteModel = new FavoriteModel();
-
-    FavoriteHelper favoriteHelper = FavoriteHelper.getInstance(this);
 
 
     @Override
@@ -48,87 +49,96 @@ public class MovieDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_detail);
 
+        favoriteHelper = FavoriteHelper.getInstance(this);
+        favoriteHelper.open();
+
         setView();
-        getDataApi();
     }
 
     private void setView() {
-        img2 = findViewById(R.id.img2);
-        img3 = findViewById(R.id.img3);
-        tv4 = findViewById(R.id.tv4);
-        tv5 = findViewById(R.id.tv5);
-        tv6 = findViewById(R.id.tv6);
-        date = findViewById(R.id.tv_date);
-        love = findViewById(R.id.favbutton);
-        back  = findViewById(R.id.backbutton);
+        imgFilmBanner = findViewById(R.id.img_film_banner);
+        imgFilmCover = findViewById(R.id.img_film_cover);
+        tvFilmTitle = findViewById(R.id.tv_film_title);
+        tvRating = findViewById(R.id.tv_rating);
+        tvFilmSynopsis = findViewById(R.id.tv_film_synopsis);
+        tvReleaseDate = findViewById(R.id.tv_release_date);
+        favBtn = findViewById(R.id.favbutton);
+        backBtn = findViewById(R.id.backbutton);
+        fabShareBtn = findViewById(R.id.fabShare);
 
-        back.setOnClickListener(view -> {
+        Intent intent = getIntent();
+        movieId = intent.getStringExtra("movie_id");
+        judul = intent.getStringExtra("judul");
+        rating = intent.getStringExtra("rating");
+        synopsis = intent.getStringExtra("synopsis");
+        backdropPath = intent.getStringExtra("backdrop");
+        poster = intent.getStringExtra("poster");
+        dates = intent.getStringExtra("date");
+
+        tvFilmTitle.setText(judul);
+        tvRating.setText(rating);
+        tvFilmSynopsis.setText(synopsis);
+        tvReleaseDate.setText(formatDate(dates));
+
+        Glide.with(MovieDetailActivity.this)
+                .load("https://image.tmdb.org/t/p/w500" + backdropPath)
+                .into(imgFilmBanner);
+        Glide.with(MovieDetailActivity.this)
+                .load("https://image.tmdb.org/t/p/w500" + poster)
+                .into(imgFilmCover);
+
+
+        backBtn.setOnClickListener(view -> {
             finish();
         });
 
-        love.setOnClickListener(view -> {
+        fabShareBtn.setOnClickListener(view -> {
+            Intent shareIntent = new Intent(Intent.ACTION_SEND);
+            shareIntent.setType("text/plain");
+            String subject = "Check out this movie! " + judul + " on EAI Movie App";
+            String description = "Title: " + judul + "\n" +
+                    "Rating: " + rating + "\n" +
+                    "Synopsis: " + synopsis + "\n" +
+                    "Release Date: " + formatDate(dates) + "\n" +
+                    "https://www.themoviedb.org/movie/" + movieId;
+            shareIntent.putExtra(Intent.EXTRA_SUBJECT, subject);
+            shareIntent.putExtra(Intent.EXTRA_TEXT, description);
+            startActivity(Intent.createChooser(shareIntent, "Share using"));
+        });
+
+        // Cek apakah film ini sudah favorit atau tidak
+        isFavorite = favoriteHelper.isFavorite(Integer.parseInt(movieId));
+        Log.d("isFavorite", String.valueOf(isFavorite));
+
+        // Atur ikon favorit berdasarkan status favorit
+        if (isFavorite) {
+            favBtn.setImageResource(R.drawable.red_favorite);
+        } else {
+            favBtn.setImageResource(R.drawable.baseline_favorite_border_24);
+        }
+
+        favBtn.setOnClickListener(view -> {
             if (!isFavorite) {
-                love.setImageResource(R.drawable.red_favorite);
+                favBtn.setImageResource(R.drawable.red_favorite);
+                favoriteModel = new FavoriteModel(
+                        movieId,
+                        judul,
+                        dates,
+                        synopsis,
+                        poster,
+                        backdropPath,
+                        rating
+                );
                 favoriteHelper.insertFavorite(favoriteModel);
                 isFavorite = true;
+                Toast.makeText(MovieDetailActivity.this, "Added to Favorites", Toast.LENGTH_SHORT).show();
             } else {
-                love.setImageResource(R.drawable.baseline_favorite_border_24);
-                favoriteHelper.deleteFavorite(favoriteModel.getId());
+                favBtn.setImageResource(R.drawable.baseline_favorite_border_24);
+                favoriteHelper.deleteFavorite(Integer.parseInt(movieId));
                 isFavorite = false;
+                Toast.makeText(MovieDetailActivity.this, "Removed from Favorites", Toast.LENGTH_SHORT).show();
             }
         });
-    }
-
-    private void getDataApi() {
-        if (isNetworkAvailable()) {
-            Intent intent = getIntent();
-            String movieId = intent.getStringExtra("movie_id");
-            Toast.makeText(this, movieId, Toast.LENGTH_SHORT).show();
-
-            Call<MovieDetailDataResponse> call = ApiConfig.getApiService().getMovieDetails(Integer.valueOf(movieId), "35254a98cc59f9518caf1bacbf0f5792");
-            call.enqueue(new Callback<MovieDetailDataResponse>() {
-                @Override
-                public void onResponse(Call<MovieDetailDataResponse> call, Response<MovieDetailDataResponse> response) {
-                    if (response.isSuccessful()) {
-                        Toast.makeText(MovieDetailActivity.this, "test", Toast.LENGTH_SHORT).show();
-                        if (response.body() != null) {
-
-                            String judul = getIntent().getStringExtra("judul");
-                            String rating = getIntent().getStringExtra("rating");
-                            String synopsis = getIntent().getStringExtra("synopsis");
-                            String backdropPath = getIntent().getStringExtra("backdrop");
-                            String poster = getIntent().getStringExtra("poster");
-                            String dates = getIntent().getStringExtra("date");
-
-                            tv4.setText(judul);
-                            tv5.setText(rating);
-                            tv6.setText(synopsis);
-                            date.setText(formatDate(dates));
-
-                            Glide.with(MovieDetailActivity.this)
-                                    .load("https://image.tmdb.org/t/p/w500" + backdropPath)
-                                    .into(img2);
-                            Glide.with(MovieDetailActivity.this)
-                                    .load("https://image.tmdb.org/t/p/w500" + poster)
-                                    .into(img3);
-                        }
-                    } else {
-                        Log.d("MovieDetailActivity", "Unable to fetch data!");
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<MovieDetailDataResponse> call, Throwable t) {
-                    Log.d("MovieDetailActivity", "Unable to fetch data!");
-                }
-            });
-        }
-    }
-
-    private boolean isNetworkAvailable() {
-        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-        return networkInfo != null && networkInfo.isConnected();
     }
 
     public static String formatDate(String inputDate) {

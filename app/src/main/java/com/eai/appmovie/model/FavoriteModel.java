@@ -6,13 +6,13 @@ import android.os.Parcelable;
 import androidx.annotation.NonNull;
 
 public class FavoriteModel implements Parcelable {
-    private int id, type;
-    private String title, date, overview, poster_path, backdrop_path, vote_average;
+    private String id, title, date, overview, poster_path, backdrop_path, vote_average;
 
     public FavoriteModel() {
     }
 
-    public FavoriteModel(int id, String title, String date, String overview, String poster_path, String backdrop_path, String vote_average, int type) {
+    public FavoriteModel(String id, String title, String date, String overview, String poster_path,
+                         String backdrop_path, String vote_average) {
         this.id = id;
         this.title = title;
         this.date = date;
@@ -20,12 +20,10 @@ public class FavoriteModel implements Parcelable {
         this.poster_path = poster_path;
         this.backdrop_path = backdrop_path;
         this.vote_average = vote_average;
-        this.type = type;
     }
 
     protected FavoriteModel(Parcel in) {
-        id = in.readInt();
-        type = in.readInt();
+        id = in.readString();
         title = in.readString();
         date = in.readString();
         overview = in.readString();
@@ -46,21 +44,15 @@ public class FavoriteModel implements Parcelable {
         }
     };
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
-    public int getType() {
-        return type;
-    }
 
-    public void setType(int type) {
-        this.type = type;
-    }
 
     public String getTitle() {
         return title;
@@ -117,8 +109,7 @@ public class FavoriteModel implements Parcelable {
 
     @Override
     public void writeToParcel(@NonNull Parcel dest, int flags) {
-        dest.writeInt(id);
-        dest.writeInt(type);
+        dest.writeString(id);
         dest.writeString(title);
         dest.writeString(date);
         dest.writeString(overview);

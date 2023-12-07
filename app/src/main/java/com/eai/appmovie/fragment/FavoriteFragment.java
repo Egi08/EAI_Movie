@@ -2,9 +2,11 @@ package com.eai.appmovie.fragment;
 
 import android.database.Cursor;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,63 +17,77 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.eai.appmovie.R;
 import com.eai.appmovie.adapter.FavoriteAdapter;
-import com.eai.appmovie.adapter.MovieAdapter;
 import com.eai.appmovie.model.FavoriteModel;
+import com.eai.appmovie.model.MovieModel;
 import com.eai.appmovie.sqllite.DatabaseContract;
 import com.eai.appmovie.sqllite.FavoriteHelper;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class FavoriteFragment extends Fragment {
 
+    private TextView tvNoFavorites;
     private RecyclerView recyclerView;
-    private FavoriteAdapter adapter;
+    private FavoriteAdapter favoriteAdapter;
     private FavoriteHelper favoriteHelper;
+    private ArrayList<FavoriteModel> favoriteList;
 
-    @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_favorite, container, false);
 
+        tvNoFavorites = view.findViewById(R.id.tv_no_favorites);
         recyclerView = view.findViewById(R.id.recyclerView);
-        recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        favoriteHelper = FavoriteHelper.getInstance(getContext());
+        favoriteHelper = FavoriteHelper.getInstance(getActivity());
         favoriteHelper.open();
-
-        loadFavoriteMovies();
+        loadFavorites();
 
         return view;
     }
 
-    private void loadFavoriteMovies() {
-        ArrayList<FavoriteModel> favoriteMovies = convertCursorToFavoriteList(favoriteHelper.queryAll());
-        adapter = new FavoriteAdapter(getContext(), favoriteMovies);
-        recyclerView.setAdapter(adapter);
-    }
-
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-        favoriteHelper.close();
+    public void onResume() {
+        super.onResume();
+        loadFavorites();
     }
 
-    private ArrayList<FavoriteModel> convertCursorToFavoriteList(Cursor cursor) {
-        ArrayList<FavoriteModel> favoriteMovies = new ArrayList<>();
-
+    private void loadFavorites() {
+        Cursor cursor = favoriteHelper.getAllFavorites();
+        ArrayList<FavoriteModel>  favoriteList = new ArrayList<>();
         while (cursor.moveToNext()) {
-            FavoriteModel favoriteModel = new FavoriteModel();
-            favoriteModel.setId(cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseContract.ItemColumns._ID)));
-            favoriteModel.setTitle(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseContract.ItemColumns.TITLE)));
-            favoriteModel.setDate(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseContract.ItemColumns.DATE)));
-            favoriteModel.setOverview(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseContract.ItemColumns.OVERVIEW)));
-            favoriteModel.setPoster_path(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseContract.ItemColumns.POSTER_PATH)));
-            favoriteModel.setBackdrop_path(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseContract.ItemColumns.BACKDROP_PATH)));
-            favoriteModel.setVote_average(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseContract.ItemColumns.VOTE_AVERAGE)));
-            favoriteModel.setType(Integer.parseInt(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseContract.ItemColumns.TYPE))));
-            favoriteMovies.add(favoriteModel);
+            int idIndex = cursor.getColumnIndex(DatabaseContract.FavoriteColumns.ID);
+            String id = idIndex != -1 ? cursor.getString(idIndex) : null;
+
+            int titleIndex = cursor.getColumnIndex(DatabaseContract.FavoriteColumns.TITLE);
+            String title = titleIndex != -1 ? cursor.getString(titleIndex) : null;
+
+            int dateIndex = cursor.getColumnIndex(DatabaseContract.FavoriteColumns.DATE);
+            String date = dateIndex != -1 ? cursor.getString(dateIndex) : null;
+
+            int overviewIndex = cursor.getColumnIndex(DatabaseContract.FavoriteColumns.OVERVIEW);
+            String overview = overviewIndex != -1 ? cursor.getString(overviewIndex) : null;
+
+            int posterPathIndex = cursor.getColumnIndex(DatabaseContract.FavoriteColumns.POSTER_PATH);
+            String posterPath = posterPathIndex != -1 ? cursor.getString(posterPathIndex) : null;
+
+            int backdropPathIndex = cursor.getColumnIndex(DatabaseContract.FavoriteColumns.BACKDROP_PATH);
+            String backdropPath = backdropPathIndex != -1 ? cursor.getString(backdropPathIndex) : null;
+
+            int voteAverageIndex = cursor.getColumnIndex(DatabaseContract.FavoriteColumns.VOTE_AVERAGE);
+            String voteAverage = voteAverageIndex != -1 ? cursor.getString(voteAverageIndex) : null;
+
+            favoriteList.add(new FavoriteModel(id, title, date, overview, posterPath, backdropPath, voteAverage));
         }
 
-        return favoriteMovies;
+        if (favoriteList.isEmpty()) {
+            recyclerView.setVisibility(View.GONE);
+            tvNoFavorites.setVisibility(View.VISIBLE);
+        } else {
+            favoriteAdapter = new FavoriteAdapter(getActivity(), favoriteList);
+            recyclerView.setAdapter(favoriteAdapter);
+        }
     }
 }

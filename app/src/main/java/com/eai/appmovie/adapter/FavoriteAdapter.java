@@ -1,11 +1,13 @@
 package com.eai.appmovie.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
@@ -25,11 +27,14 @@ import java.util.Locale;
 
 public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ViewHolder> {
     private final String imgBaseUrl = "https://image.tmdb.org/t/p/w500";
+    Context context;
     private ArrayList<FavoriteModel> favoriteModels;
 
     public FavoriteAdapter(Context context, ArrayList<FavoriteModel> favoriteModels) {
+        this.context = context;
         this.favoriteModels = favoriteModels;
     }
+
 
     @NonNull
     @Override
@@ -54,7 +59,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ViewHo
     public class ViewHolder extends RecyclerView.ViewHolder {
         ImageView imageView, icon;
         TextView title, releaseDate;
-        CardView itemCard;
+        CardView cardView;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -62,7 +67,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ViewHo
             icon = itemView.findViewById(R.id.icon_type_iv);
             title = itemView.findViewById(R.id.title_tv);
             releaseDate = itemView.findViewById(R.id.release_date);
-            itemCard = itemView.findViewById(R.id.item_cv);
+            cardView = itemView.findViewById(R.id.item_cv);
         }
 
         public void setDataMovie(FavoriteModel favoriteModel, Context context) {
@@ -74,11 +79,17 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ViewHo
                     .placeholder(R.drawable.no_img)
                     .into(imageView);
 
-            if (favoriteModel.getType() == MovieDetailActivity.TYPE) {
-                icon.setImageResource(R.drawable.baseline_movie_24);
-            } else {
-                icon.setImageResource(R.drawable.baseline_tv_24);
-            }
+            cardView.setOnClickListener(view -> {
+                Intent intent = new Intent(context, MovieDetailActivity.class);
+                intent.putExtra("movie_id", favoriteModel.getId());
+                intent.putExtra("judul", favoriteModel.getTitle());
+                intent.putExtra("rating", favoriteModel.getVote_average());
+                intent.putExtra("synopsis", favoriteModel.getOverview());
+                intent.putExtra("backdrop", favoriteModel.getBackdrop_path());
+                intent.putExtra("poster", favoriteModel.getPoster_path());
+                intent.putExtra("date", favoriteModel.getDate());
+                context.startActivity(intent);
+            });
         }
     }
 

@@ -2,52 +2,44 @@ package com.eai.appmovie.adapter;
 
 
 import android.content.Context;
+import android.database.Cursor;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CursorAdapter;
 import android.widget.TextView;
-
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.eai.appmovie.R;
 
 import java.util.List;
 
-public class SearchHistoryAdapter extends RecyclerView.Adapter<SearchHistoryAdapter.ViewHolder> {
+public class SearchHistoryAdapter extends CursorAdapter {
 
-    private final Context context;
-    private final List<String> searchHistoryList;
+    private List<String> items;
 
-    public SearchHistoryAdapter(Context context, List<String> searchHistoryList) {
-        this.context = context;
-        this.searchHistoryList = searchHistoryList;
-    }
+    private TextView tvSearchHistory;
 
-    @NonNull
-    @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.item_search_history, parent, false);
-        return new ViewHolder(view);
+    public SearchHistoryAdapter(Context context, Cursor cursor, List<String> items) {
+        super(context, cursor, false);
+        this.items = items;
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        String searchQuery = searchHistoryList.get(position);
-        holder.historyTextView.setText(searchQuery);
+    public void bindView(View view, Context context, Cursor cursor) {
+
+        tvSearchHistory.setText(items.get(cursor.getPosition()));
+
     }
 
     @Override
-    public int getItemCount() {
-        return searchHistoryList.size();
-    }
+    public View newView(Context context, Cursor cursor, ViewGroup parent) {
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        public final TextView historyTextView;
+        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        public ViewHolder(@NonNull View itemView) {
-            super(itemView);
-            historyTextView = itemView.findViewById(R.id.historyTextView);
-        }
+        View view = inflater.inflate(R.layout.item_search_history, parent, false);
+
+        tvSearchHistory = (TextView) view.findViewById(R.id.tv_search_history);
+
+        return view;
     }
 }
