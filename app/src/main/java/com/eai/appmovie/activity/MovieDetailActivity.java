@@ -155,4 +155,11 @@ public class MovieDetailActivity extends AppCompatActivity {
 
         return formattedDate;
     }
+
+    public static String formatRating(String rating) {
+//        i want rating to be one decimal place
+        double ratingDouble = Double.parseDouble(rating);
+        String ratingString = String.format("%.1f", ratingDouble);
+        return ratingString;
+    }
 }
