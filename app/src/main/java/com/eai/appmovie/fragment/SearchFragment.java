@@ -62,6 +62,8 @@ public class SearchFragment extends Fragment {
     private static final String PREF_SEARCH_HISTORY = "search_history";
     private Set<String> searchHistorySet;
 
+
+
     public SearchFragment() {
         // Required empty public constructor
     }
@@ -88,18 +90,34 @@ public class SearchFragment extends Fragment {
         // Set searchable configuration
         svSearchFilm.setSubmitButtonEnabled(true);
 
+        // Inisialisasi set riwayat pencarian
+        searchHistorySet = new HashSet<>();
+
+// Muat riwayat pencarian sebelumnya dari Shared Preferences
+        SharedPreferences sharedPreferences = getActivity().getSharedPreferences(PREF_SEARCH_HISTORY, Context.MODE_PRIVATE);
+        searchHistorySet.addAll(sharedPreferences.getStringSet(PREF_SEARCH_HISTORY, new HashSet<>()));
+
+// Muat riwayat pencarian ke SearchView
+loadHistory("");
+
+
         // Set query text listener
         svSearchFilm.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 performSearch(query);
-                return false;
+                loadHistory(query);
+                return true;
             }
+
+
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                return false;
+                loadHistory(newText);
+                return true;
             }
+
         });
 
         return view;
@@ -146,29 +164,39 @@ public class SearchFragment extends Fragment {
             Log.e("SearchFragment", "Error performing search", e);
             Toast.makeText(getContext(), "An error occurred while performing the search", Toast.LENGTH_SHORT).show();
         }
+
+        // Tambahkan query pencarian ke dalam riwayat pencarian
+        searchHistorySet.add(query);
+        saveSearchHistory();
+
     }
 
     private void loadHistory(String query) {
-
-        // Cursor
+        // Buat cursor untuk riwayat pencarian
         String[] columns = new String[]{"_id", "text"};
         Object[] temp = new Object[]{0, "default"};
-
         MatrixCursor cursor = new MatrixCursor(columns);
 
-        for (int i = 0; i < items.size(); i++) {
-
-            temp[0] = i;
-            temp[1] = items.get(i);
-
+        // Tambahkan setiap riwayat pencarian ke dalam cursor
+        int id = 0;
+        for (String history : searchHistorySet) {
+            temp[0] = id++;
+            temp[1] = history;
             cursor.addRow(temp);
-
         }
 
-        // SearchView
-        SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
-        svSearchFilm.setSuggestionsAdapter(new SearchHistoryAdapter(getActivity(), cursor, items));
+        // Set adapter cursor ke SearchView
+        svSearchFilm.setSuggestionsAdapter(new SearchHistoryAdapter(getActivity(), cursor, new ArrayList<>(searchHistorySet)));
+
     }
+
+    private void saveSearchHistory() {
+    SharedPreferences sharedPreferences = getActivity().getSharedPreferences(PREF_SEARCH_HISTORY, Context.MODE_PRIVATE);
+    SharedPreferences.Editor editor = sharedPreferences.edit();
+    editor.putStringSet(PREF_SEARCH_HISTORY, searchHistorySet);
+    editor.apply();
+}
+
 
 }
 
